@@ -1,0 +1,34 @@
+server:
+  port: 9090
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    username: trung03trung@gmail.com
+    password: yhzztttnihpqlclt
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/spring
+    username: itsol
+    password: 123456
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+application:
+  security:
+    jwt:
+      secretKey: de6aaeabadeccc598160172044da9c566242ae3b
+      tokenValidityMilliseconds: 86400000
+      rememberMeTokenValiditySeconds: 25920000000
