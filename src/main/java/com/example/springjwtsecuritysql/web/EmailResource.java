@@ -29,4 +29,10 @@ public class EmailResource {
         String status = emailService.sendMailWithAttachment(details);
         return status;
     }
+
+    @PostMapping("/send-email-multiple-recipients")
+    public String sendEmailToMultipleRecipients(String to, String email) {
+        String status = emailService.sendEmailToMultipleRecipients(to,email);
+        return status;
+    }
 }
