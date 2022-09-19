@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.springjwtsecuritysql.core.Constants;
 import com.example.springjwtsecuritysql.domain.Role;
 import com.example.springjwtsecuritysql.domain.User;
 import com.example.springjwtsecuritysql.service.dto.UserDTO;
@@ -31,7 +32,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = Constants.Api.Path.PREFIX)
 @RequiredArgsConstructor
 public class UserResource {
     private final UserService userService;

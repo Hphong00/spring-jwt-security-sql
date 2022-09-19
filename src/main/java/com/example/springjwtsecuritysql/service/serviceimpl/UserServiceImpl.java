@@ -1,7 +1,8 @@
-package com.example.springjwtsecuritysql.service;
+package com.example.springjwtsecuritysql.service.serviceimpl;
 
 import com.example.springjwtsecuritysql.domain.Role;
 import com.example.springjwtsecuritysql.domain.User;
+import com.example.springjwtsecuritysql.service.UserService;
 import com.example.springjwtsecuritysql.service.dto.UserDTO;
 import com.example.springjwtsecuritysql.reponsitory.RoleRepository;
 import com.example.springjwtsecuritysql.reponsitory.UserRepository;

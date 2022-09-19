@@ -46,18 +46,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/webjars/**").permitAll()
                 .antMatchers("/api/login/**", "/api/token/refresh/**").permitAll()
-//                .antMatchers(GET, "/api/user/**").hasAnyAuthority(AuthoritiesConstants.ROLE_USER)
-//                .antMatchers(POST, "/api/user/save/**").hasAnyAuthority(AuthoritiesConstants.ROLE_ADMIN)
                 .antMatchers(GET, "/api/user/**").permitAll()
                 .antMatchers(POST, "/api/user/save/**").permitAll()
+                .antMatchers("/api/users").hasAnyAuthority(AuthoritiesConstants.ROLE_ADMIN)
+                .antMatchers("/api/users/**").hasAnyAuthority(AuthoritiesConstants.ROLE_ADMIN)
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(customAuthenticationFilter)
+                .httpBasic()
+                .and()
                 .addFilterBefore(new CustomAuthorizatuibFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedPage("/403");
+//        http
+//                .requiresChannel()
+//                .antMatchers("/api/login").requiresSecure();
     }
 
     @Bean
