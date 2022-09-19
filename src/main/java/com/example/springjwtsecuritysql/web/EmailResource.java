@@ -4,10 +4,9 @@ import com.example.springjwtsecuritysql.core.Constants;
 import com.example.springjwtsecuritysql.service.EmailService;
 import com.example.springjwtsecuritysql.service.email.EmailDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = Constants.Api.Path.PREFIX)
@@ -34,5 +33,10 @@ public class EmailResource {
     public String sendEmailToMultipleRecipients(String to, String email) {
         String status = emailService.sendEmailToMultipleRecipients(to,email);
         return status;
+    }
+
+    @GetMapping("/get-all-email")
+    public List<String> getAllEmail() {
+        return emailService.getAllEmail();
     }
 }

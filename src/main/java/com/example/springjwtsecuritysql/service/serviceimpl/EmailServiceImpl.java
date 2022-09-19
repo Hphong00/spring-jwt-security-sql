@@ -1,9 +1,13 @@
 package com.example.springjwtsecuritysql.service.serviceimpl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.example.springjwtsecuritysql.reponsitory.UserRepository;
+import com.example.springjwtsecuritysql.reponsitory.repoimpl.UserRepositoryImpl;
 import com.example.springjwtsecuritysql.service.EmailService;
 import com.example.springjwtsecuritysql.service.email.EmailDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @Autowired
+    private UserRepositoryImpl userRepository;
 
     @Value("${spring.mail.username}")
     private String sender;
@@ -83,7 +90,12 @@ public class EmailServiceImpl implements EmailService {
             //helper.setTo(to);
             //send an email to multiple recipients
             //helper.setTo(InternetAddress.parse("hoangxuanphong200@gmail.com,a32712@thanglong.edu.vn"));
-            helper.setTo(new String[]{"hoangxuanphong2000@gmail.com","dangthu0211@gmail.com"});
+            List<String> allEmails = getAllEmail();
+            String[] emails = new String[allEmails.size()];
+            for (int i = 0; i < allEmails.size(); i++) {
+                emails[i] = allEmails.get(i);
+            }
+            helper.setTo(emails);
             helper.setSubject("Confirm your email");
             helper.setFrom("trung03trung@gmail.com");
             javaMailSender.send(mimeMessage);
@@ -92,6 +104,12 @@ public class EmailServiceImpl implements EmailService {
             e.printStackTrace();
             throw new IllegalStateException("failed to send email");
         }
+    }
+
+    @Override
+    public List<String> getAllEmail() {
+        List<String> listEmails = userRepository.getAllEmail();
+        return listEmails;
     }
 
     public String buildOtpEmail(String name, String otp) {
