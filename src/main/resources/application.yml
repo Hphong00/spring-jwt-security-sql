@@ -1,6 +1,7 @@
 server:
-  port: 9090
-
+  servlet:
+    context-path: /
+    port: 8080
 spring:
   mail:
     host: smtp.gmail.com
@@ -20,6 +21,16 @@ spring:
     username: itsol
     password: 123456
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 144694474399-4je2amacsr47q8vkei1nmo54cmgdiidb.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
   jpa:
     show-sql: false
     hibernate:
@@ -32,3 +43,7 @@ application:
       secretKey: de6aaeabadeccc598160172044da9c566242ae3b
       tokenValidityMilliseconds: 86400000
       rememberMeTokenValiditySeconds: 25920000000
+twilio:
+  account_sid: ACf52dea0eeae683f5f2c3c6fb681e67dd
+  auth_token: 7ba059acf801bc946894e67761c7b330
+  trial_number: +12232185034
