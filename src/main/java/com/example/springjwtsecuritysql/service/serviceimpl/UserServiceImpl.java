@@ -25,27 +25,27 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     public final UserMapper userMapper;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            log.error("user not found in database");
-            throw new UsernameNotFoundException("user not found");
-        } else {
-            log.info("user found in the databas", username);
-        }
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getCode()));
-        });
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username);
+//        if (user == null) {
+//            log.error("user not found in database");
+//            throw new UsernameNotFoundException("user not found");
+//        } else {
+//            log.info("user found in the databas", username);
+//        }
+//        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//        user.getRoles().forEach(role -> {
+//            authorities.add(new SimpleGrantedAuthority(role.getCode()));
+//        });
+//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+//    }
     @Override
     public User saveUser(UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);

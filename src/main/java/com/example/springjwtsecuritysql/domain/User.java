@@ -2,6 +2,8 @@ package com.example.springjwtsecuritysql.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -29,6 +31,11 @@ public class User {
 
     @Column(name = "email")
     String email;
+
+    @Column(name = "activate")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private boolean activate = true;
+    ;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();

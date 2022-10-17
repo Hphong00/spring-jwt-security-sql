@@ -1,44 +1,49 @@
 package com.example.springjwtsecuritysql.security;
 
+import com.example.springjwtsecuritysql.core.Constants;
+import com.example.springjwtsecuritysql.security.jwt.JWTConfigurer;
+import com.example.springjwtsecuritysql.security.jwt.TokenProvider;
 import com.example.springjwtsecuritysql.service.auth2.CustomOAuth2UserService;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    CorsFilter corsFilter;
+
+    TokenProvider tokenProvider;
 
     @Autowired
     private CustomOAuth2UserService oAuth2UserService;
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+
+    public SecurityConfig(CorsFilter corsFilter, TokenProvider tokenProvider, CustomOAuth2UserService oAuth2UserService) {
+        this.corsFilter = corsFilter;
+        this.tokenProvider = tokenProvider;
+        this.oAuth2UserService = oAuth2UserService;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+    public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
                 .disable()
@@ -52,20 +57,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/configuration/security",
                         "/swagger-ui.html",
                         "/webjars/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .antMatchers("/api/login/**", "/api/token/refresh/**").permitAll()
-                .antMatchers(POST, "/api/user/save/**").permitAll()
                 .antMatchers("/api/users").permitAll()
                 .antMatchers("/api/users/**").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/", "/login", "/oauth/**").permitAll()
+                .antMatchers(Constants.Api.Path.AUTH + "/**").permitAll()
+                .antMatchers("/api/logout").permitAll()
+                .antMatchers("/api/register").permitAll()
+                .antMatchers("/api/admin/**").hasAnyAuthority(Constants.Role.ADMIN, Constants.Role.JE)
+                .antMatchers("/api/user/**").hasAnyRole(Constants.Role.JE, Constants.Role.ADMIN, Constants.Role.USER)
+                .antMatchers("/api/public/**").permitAll()
+                .antMatchers("/api/**").permitAll()
+                .antMatchers("/", "/login", "/oauth/**").permitAll().antMatchers("/", "/login", "/oauth/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(customAuthenticationFilter)
                 .httpBasic()
                 .and()
-                .addFilterBefore(new CustomAuthorizatuibFilter(), UsernamePasswordAuthenticationFilter.class)
+                .apply(securityConfigurerAdapter())
+                .and()
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedPage("/403")
                 .and()
@@ -73,15 +87,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login")
                 .userInfoEndpoint()
                 .userService(oAuth2UserService);
-//        http
-//                .requiresChannel()
-//                .antMatchers("/api/login").requiresSecure();
     }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    private JWTConfigurer securityConfigurerAdapter() {
+        return new JWTConfigurer(tokenProvider);
     }
-
 }
